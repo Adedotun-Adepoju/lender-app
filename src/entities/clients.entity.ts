@@ -2,30 +2,40 @@ import {
     Column,
     CreateDateColumn, 
     Entity, 
+    OneToMany, 
     PrimaryGeneratedColumn,
-    UpdateDateColumn,
-    ManyToOne,
-    JoinColumn
-} from 'typeorm';
+    UpdateDateColumn
+} from 'typeorm'
 import { Transaction } from './transactions.entity';
 
-@Entity({ name: 'payments' })
-export class Payment {
+export enum Type {
+    BVN = 'bvn',
+    NIN = 'nin',
+    DRIVERS_LICENSE = 'drivers_license',
+}
+
+@Entity({ name: 'clients' })
+export class Client {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    @ManyToOne(() => Transaction, (transaction) => transaction.payments)
-    @JoinColumn({ name: 'transaction_id'})
-    transaction: Transaction
+    @Column()
+    first_name: string 
 
     @Column()
-    transaction_reference: string 
+    last_name: number;
 
     @Column()
-    amount_paid: number;
+    contact_number: string;
+
+    @Column({ type: 'enum', enum: Type })
+    id_type: Type
 
     @Column()
-    status: string;
+    id_value: string;
+
+    @OneToMany(() => Transaction, (transaction) => transaction.client)
+    transactions: Transaction[]
 
     @CreateDateColumn({
         type: 'timestamp',
