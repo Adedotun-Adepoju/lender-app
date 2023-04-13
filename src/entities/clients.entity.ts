@@ -29,11 +29,6 @@ export class Client {
     @Column()
     last_name: string;
 
-    @OneToOne(() => PaymentAccount)
-    @JoinColumn({ name: 'payment_account_id'})
-    client: Client
-
-
     @Column()
     contact_number: string;
 

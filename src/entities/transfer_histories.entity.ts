@@ -22,7 +22,7 @@ export class TransferHistory {
     @PrimaryGeneratedColumn()
     public id: number;
 
-    @OneToOne(() => Transaction)
+    @ManyToOne(() => Transaction, (transaction) => transaction.transfer_histories)
     @JoinColumn({ name: 'transaction_id'})
     transaction: Transaction
 
