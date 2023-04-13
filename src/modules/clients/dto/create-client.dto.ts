@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'src/entities/clients.entity';
 
 export class CreateClientDto {
     @IsString()
@@ -15,7 +16,7 @@ export class CreateClientDto {
 
     @IsString()
     @IsNotEmpty()
-    id_type: string;
+    id_type: Type;
 
     @IsString()
     @IsNotEmpty()

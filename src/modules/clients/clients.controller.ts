@@ -18,9 +18,9 @@ export class ClientsController {
         return this.clientsService.findAll()
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string){
-        return this.clientsService.findOne(id);
+    @Get('/b54-customers')
+    async findCustomersFromB54(){
+        return await this.clientsService.findRegisteredCustomersWithB54()
     }
 
 
