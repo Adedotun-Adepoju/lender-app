@@ -2,11 +2,15 @@ import {
     Column,
     CreateDateColumn, 
     Entity, 
+    JoinColumn, 
     OneToMany, 
+    OneToOne, 
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from 'typeorm'
 import { Transaction } from './transactions.entity';
+import { PaymentAccount } from './payment_accounts.entity';
+import { TransferHistory } from './transfer_histories.entity';
 
 export enum Type {
     BVN = 'bvn',
@@ -25,6 +29,11 @@ export class Client {
     @Column()
     last_name: string;
 
+    @OneToOne(() => PaymentAccount)
+    @JoinColumn({ name: 'payment_account_id'})
+    client: Client
+
+
     @Column()
     contact_number: string;
 
@@ -36,6 +45,9 @@ export class Client {
 
     @OneToMany(() => Transaction, (transaction) => transaction.client)
     transactions: Transaction[]
+
+    @OneToMany(() => TransferHistory, (transferHistory) => transferHistory.client)
+    transfer_histories: TransferHistory[]
 
     @CreateDateColumn({
         type: 'timestamp',
