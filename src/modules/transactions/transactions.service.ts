@@ -6,16 +6,21 @@ import { CreateTransactionDto } from './dto/createTransaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import axios, { AxiosInstance } from "axios";
 const randomstring = require("randomstring")
+import { PaymentsService } from '../payments/payments.service'
+import { addDays } from 'date-fns'
+import { generateInterest } from '../../helpers/utils';
 
 @Injectable()
 export class TransactionsService {
     protected readonly axiosInstance: AxiosInstance
     protected readonly customerPartnerId: string
+    // protected readonly paymentsService: PaymentsService
     constructor(
         @InjectRepository(Transaction)
         private readonly transactionRepo: Repository<Transaction>,
         @InjectRepository(Client)
         private readonly clientRepo: Repository<Client>,
+        private readonly paymentsService: PaymentsService
     ){
         this.axiosInstance = axios.create({
             baseURL: process.env.B54_API,
@@ -29,9 +34,68 @@ export class TransactionsService {
     async create(createTransactionDto: CreateTransactionDto){
         // for reference
         const randomString = randomstring.generate({ length: 16, charset: 'alphanumeric' })
+        const { 
+          client_id, 
+          amount_disbursed, 
+          transaction_date, 
+          tenor, 
+          interest_rate, 
+          number_of_installments } = createTransactionDto
+        
         const client = await this.clientRepo.findOne({ 
-
+          where:{
+            id: client_id
+          }
         })
+
+        if(!client) {
+          return {
+            status: 'error',
+            message: `Client with ID ${client_id} does not exist`
+          }
+        }
+
+        const amount_expected = amount_disbursed + generateInterest(amount_disbursed, interest_rate, tenor)
+        const dividedExpectedAmount = Number((amount_expected / number_of_installments).toFixed(2))
+
+        const transactionRecordObject = {
+          client_id,
+          reference: randomString,
+          transaction_date: new Date(transaction_date),
+          amount_disbursed,
+          interest_rate,
+          tenor,
+          amount_paid: 0,
+          amount_outstanding: amount_expected,
+          expected_payment_date: addDays(new Date(transaction_date), tenor),
+          actual_payment_date: null,
+          number_of_installments,
+          amount_expected
+        }
+
+        // Create transaction record
+        const transactionRecord = this.transactionRepo.create(transactionRecordObject)
+
+        // Create payment records
+        let paymentRecordObjects = []
+        let count = 0
+        while(count < number_of_installments) {
+          paymentRecordObjects.push({
+            transaction_reference: randomString,
+            amount_paid: 0,
+            status: "pending",
+            amount_expected: dividedExpectedAmount
+          })
+          count++
+        }
+        let paymentRecords = await this.paymentsService.create(paymentRecordObjects)
+
+        let transactionRecords = await this.transactionRepo.save(transactionRecord)
+        return {
+          paymentsData: paymentRecords,
+          transactionData: transactionRecords
+        }
+
     }
 
     async findOne(id: number){

@@ -43,7 +43,7 @@ export class ClientsService {
             if(client){
                 return client
             }
-  
+            
             let response = await this.axiosInstance.post(`/customer_partners/${this.customerPartnerId}/customers`,{
                 first_name, 
                 last_name,
@@ -51,7 +51,6 @@ export class ClientsService {
                 unique_id, 
                 contact_number
             });
-            console.log(response);
             if(response.data.status != 'success'){
                 throw new HttpException('An error occured when creating the customer', HttpStatus.INTERNAL_SERVER_ERROR)
             }

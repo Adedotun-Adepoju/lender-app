@@ -47,11 +47,14 @@ export class Transaction {
     @Column({ type: 'timestamp' })
     expected_payment_date: Date;
 
-    @Column({ type: 'timestamp' })
+    @Column({ type: 'timestamp', nullable: true })
     actual_payment_date: Date;
 
     @Column()
     number_of_installments: number
+
+    @Column({ nullable: true })
+    amount_expected: number
 
     @OneToMany(() => Payment, (payment) => payment.transaction)
     payments: Payment[]

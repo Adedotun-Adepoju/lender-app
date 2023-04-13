@@ -27,6 +27,9 @@ export class Payment {
     @Column()
     status: string;
 
+    @Column({ nullable: true })
+    amount_expected: number
+
     @CreateDateColumn({
         type: 'timestamp',
         name: 'created_at',
