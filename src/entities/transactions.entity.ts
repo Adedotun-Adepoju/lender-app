@@ -10,6 +10,7 @@ import {
 } from 'typeorm'
 import { Client } from './clients.entity';
 import { Payment } from './payments.entity';
+import { TransferHistory } from './transfer_histories.entity';
 
 @Entity({ name: 'transactions' })
 export class Transaction {
@@ -58,6 +59,9 @@ export class Transaction {
 
     @OneToMany(() => Payment, (payment) => payment.transaction)
     payments: Payment[]
+
+    @OneToMany(() => TransferHistory, (transferHistory) => transferHistory.transaction)
+    transfer_histories: TransferHistory[];
 
     @CreateDateColumn({
         type: 'timestamp',
