@@ -5,18 +5,24 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
     ManyToOne,
-    JoinColumn
+    JoinColumn,
+    OneToOne
 } from 'typeorm'
+import { Client } from './clients.entity'
 
 export enum AccountType {
     BANK = 'bank',
-    MOBILE_MONEY = 'mobile_money'
+    MOBILE_MONEY = 'mobile-money'
 }
 
 @Entity({ name: 'payment_accounts' })
 export class PaymentAccount {
     @PrimaryGeneratedColumn()
     public id: number 
+
+    @OneToOne(() => Client)
+    @JoinColumn({ name: 'client_id'})
+    client: Client
 
     @Column({
         type: 'enum',
@@ -29,10 +35,7 @@ export class PaymentAccount {
     account_identifier: string
 
     @Column({ nullable: true })
-    bank: string
-
-    @Column({ nullable: true })
-    mobile_money_provider: string;
+    provider: string;
 
     @CreateDateColumn({
         type: 'timestamp',

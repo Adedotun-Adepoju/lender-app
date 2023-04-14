@@ -1,7 +1,10 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { AccountType } from 'src/entities/payment_accounts.entity';
 
 export class CreatePaymentAccountDto {
+    @IsNotEmpty()
+    client_id: number;
+
     @IsString()
     @IsNotEmpty()
     account_type: AccountType;
@@ -10,7 +13,7 @@ export class CreatePaymentAccountDto {
     @IsNotEmpty()
     account_identifier: string;
 
-    bank: string;
-
-    mobile_money_provider: string;
+    @IsString()
+    @IsOptional()
+    provider: string;
 }

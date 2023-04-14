@@ -1,11 +1,9 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
 export class DisburseFundsDto {
-    @IsString()
     @IsNotEmpty()
-    transaction_id: string;
+    transaction_id: number;
 
-    @IsString()
     @IsNotEmpty()
-    client_id: string;
+    client_id: number;
 }

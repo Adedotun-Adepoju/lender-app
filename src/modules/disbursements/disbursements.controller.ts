@@ -14,7 +14,7 @@ export class DisbursementsController {
         return this.disbursementService.createPaymentAccount(createPaymentAccountDto)
     }
 
-    @Post('/disburse')
+    @Post('/send-funds')
     disburseFunds(@Body() disburseFundsDto: DisburseFundsDto){
         return this.disbursementService.disburseFunds(disburseFundsDto)
     }
