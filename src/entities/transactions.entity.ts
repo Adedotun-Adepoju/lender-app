@@ -54,7 +54,7 @@ export class Transaction {
     @Column()
     number_of_installments: number
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'float' })
     amount_expected: number
 
     @OneToMany(() => Payment, (payment) => payment.transaction)

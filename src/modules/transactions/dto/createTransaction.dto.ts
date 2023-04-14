@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class CreateTransactionDto {
-    @IsString()
     @IsNotEmpty()
     client_id: number;
 

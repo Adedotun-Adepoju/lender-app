@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { Transaction } from 'src/entities/transactions.entity';
 
 export class CreatePaymentDto {
     @IsString()
@@ -20,4 +21,7 @@ export class CreatePaymentDto {
     @IsNumber()
     @IsNotEmpty()
     payment_index: number
+
+    @IsNotEmpty()
+    transaction: Transaction
 }

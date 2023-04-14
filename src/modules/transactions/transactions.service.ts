@@ -9,6 +9,9 @@ const randomstring = require("randomstring")
 import { PaymentsService } from '../payments/payments.service'
 import { addDays, format } from 'date-fns'
 import { generateInterest } from '../../helpers/utils';
+import { CreatePaymentDto } from '../payments/dto/create-payment.dto';
+import { DisbursementsService } from '../disbursements/disbursements.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class TransactionsService {
@@ -20,7 +23,8 @@ export class TransactionsService {
         private readonly transactionRepo: Repository<Transaction>,
         @InjectRepository(Client)
         private readonly clientRepo: Repository<Client>,
-        private readonly paymentsService: PaymentsService
+        private readonly paymentsService: PaymentsService,
+        private readonly disbursementsService: DisbursementsService
     ){
         this.axiosInstance = axios.create({
             baseURL: process.env.B54_API,
@@ -60,8 +64,8 @@ export class TransactionsService {
         const dividedExpectedAmount = Number((amount_expected / number_of_installments).toFixed(2))
         const dividedTenor = Math.ceil(tenor / number_of_installments)
 
-        const transactionRecordObject = {
-          client_id,
+        const transactionRecordObject: Partial<Transaction> = {
+          client,
           reference: randomString,
           transaction_date: new Date(transaction_date),
           amount_disbursed,
@@ -79,7 +83,7 @@ export class TransactionsService {
         const transactionRecord = this.transactionRepo.create(transactionRecordObject)
 
         // Create payment records
-        let paymentRecordObjects = []
+        let paymentRecordObjects: CreatePaymentDto[] = []
         let b54Payments = []
         let currentDate = new Date(transaction_date)
         let count = 0
@@ -91,6 +95,7 @@ export class TransactionsService {
           })
           
           paymentRecordObjects.push({
+            transaction: transactionRecord,
             transaction_reference: randomString,
             amount_paid: 0,
             status: "pending",
@@ -127,9 +132,22 @@ export class TransactionsService {
           let paymentRecords = await this.paymentsService.create(paymentRecordObjects)
   
           let transactionRecords = await this.transactionRepo.save(transactionRecord)
+          
+
+          const disbursementResponse = await this.disbursementsService.disburseFunds({
+            transaction_id: transactionRecord.id,
+            client_id: client.id
+          }); 
+
+          if(disbursementResponse.status != 'success'){
+            throw new HttpException('There was an error when trying to disburse funds', HttpStatus.INTERNAL_SERVER_ERROR)
+          }
+
+          console.log(disbursementResponse);
+
           return {
             status: 'success',
-            message: 'Transaction registered successfully',
+            message: 'Transaction registered and money disbursed to client successfully',
             paymentsData: paymentRecords,
             transactionData: transactionRecords
           }

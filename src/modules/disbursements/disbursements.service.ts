@@ -77,16 +77,24 @@ export class DisbursementsService {
         const response = await this.sendFundsToPaymentAccount(body.client_id, 10);
         console.log(response)
 
-        if(response.status == 'success'){
-           const transfer: TransferHistory = await this.transferHistoryRepo.create({
-               transaction: transaction,
-               client: client,
-               status: StatusType.PROCESSING
-           })
-
-           console.log(transfer);
+        if(response.status != 'success'){
+            return {
+                status: 'error',
+                message: 'An error occured'
+            }
         }
 
+        const transfer: TransferHistory = this.transferHistoryRepo.create({
+            transaction: transaction,
+            client: client,
+            status: StatusType.PROCESSING
+        })
+        await this.transferHistoryRepo.save(transfer);
+
+        return {
+            status: 'success',
+            message: 'Money disbursed successfully'
+        }
     }
 
     async sendFundsToPaymentAccount(client_id, amount){
@@ -117,7 +125,7 @@ export class DisbursementsService {
                 "account_number": paymentAccount.account_identifier,
                 "bank_code": BANK_CODES[paymentAccount.provider.toLowerCase()]
             }
-
+            console.log(payload)
             let response = await this.axiosInstance.post(`/baas/customer-partner/${this.customerPartnerId}/withdraw`,
                 payload
             );
@@ -137,7 +145,7 @@ export class DisbursementsService {
                 payload
             );
 
-            console.log(response)
+            return response.data
         }
     }
 }

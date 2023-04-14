@@ -27,7 +27,7 @@ export class Payment {
     @Column()
     status: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'float' })
     amount_expected: number
 
     @Column({ nullable: true })
