@@ -16,4 +16,8 @@ export class CreatePaymentDto {
     @IsNumber()
     @IsNotEmpty()
     amount_expected: number
+
+    @IsNumber()
+    @IsNotEmpty()
+    payment_index: number
 }

@@ -94,7 +94,8 @@ export class TransactionsService {
             transaction_reference: randomString,
             amount_paid: 0,
             status: "pending",
-            amount_expected: dividedExpectedAmount
+            amount_expected: dividedExpectedAmount,
+            payment_index: count + 1
           })
           currentDate = addDays(currentDate, dividedTenor)
           count++
@@ -121,19 +122,23 @@ export class TransactionsService {
           }]
         }
         const response = await this.axiosInstance.post(`transactions/register`, registerTransactionBody)
-        
+
+        if(response.data.status === 'success') {
+          let paymentRecords = await this.paymentsService.create(paymentRecordObjects)
+  
+          let transactionRecords = await this.transactionRepo.save(transactionRecord)
+          return {
+            status: 'success',
+            message: 'Transaction registered successfully',
+            paymentsData: paymentRecords,
+            transactionData: transactionRecords
+          }
+        }
         return {
-          status: 'success',
-          data: response.data
+          status: 'error',
+          message: 'Transaction registration on B54 failed. Please try again.'
         }
 
-        let paymentRecords = await this.paymentsService.create(paymentRecordObjects)
-
-        let transactionRecords = await this.transactionRepo.save(transactionRecord)
-        return {
-          paymentsData: paymentRecords,
-          transactionData: transactionRecords
-        }
 
     }
 
