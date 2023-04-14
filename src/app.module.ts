@@ -7,6 +7,7 @@ import { DisbursementsModule } from './modules/disbursements/disbursements.modul
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './shared/typeorm/typeorm.service';
 import { ConfigModule } from '@nestjs/config';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     ClientsModule,
     TransactionsModule,
+    PaymentsModule,
     DisbursementsModule
   ],
   controllers: [AppController],

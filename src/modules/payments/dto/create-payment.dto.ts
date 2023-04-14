@@ -12,4 +12,12 @@ export class CreatePaymentDto {
     @IsString()
     @IsNotEmpty()
     status: string;
+
+    @IsNumber()
+    @IsNotEmpty()
+    amount_expected: number
+
+    @IsNumber()
+    @IsNotEmpty()
+    payment_index: number
 }
